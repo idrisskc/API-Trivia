@@ -1,4 +1,5 @@
 import os
+from unittest import result
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -8,28 +9,51 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+
+def paginate_items(request, selection):
+    page = request.args.get("page", 1, type=int)
+    start = (page - 1) * QUESTIONS_PER_PAGE
+    end = start + QUESTIONS_PER_PAGE
+
+    items = [item.format() for item in selection]
+    current_items = items[start:end]
+
+    return current_items
+
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     setup_db(app)
 
-    """
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-    """
+    CORS(app)
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add(
+            "Access-Control-Allow-Headers", "Content-Type,Authorization,true"
+        )
+        response.headers.add(
+            "Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"
+        )
+        return response
+
+    @app.route("/categories")
+    def retrieve_categories():
+        selection = Category.query.all()
+
+        if len(selection) == 0:
+            abort(404)
+
+        result = {}
+        for category in selection:
+            item = category.format()
+            result[item['id']] = item['type']
+
+        return jsonify(result)
 
     """
-    @TODO: Use the after_request decorator to set Access-Control-Allow
-    """
-
-    """
-    @TODO:
-    Create an endpoint to handle GET requests
-    for all available categories.
-    """
-
-
-    """
-    @TODO:
+    TODO:
     Create an endpoint to handle GET requests for questions,
     including pagination (every 10 questions).
     This endpoint should return a list of questions,
@@ -42,7 +66,7 @@ def create_app(test_config=None):
     """
 
     """
-    @TODO:
+    TODO:
     Create an endpoint to DELETE question using a question ID.
 
     TEST: When you click the trash icon next to a question, the question will be removed.
@@ -50,7 +74,7 @@ def create_app(test_config=None):
     """
 
     """
-    @TODO:
+    TODO:
     Create an endpoint to POST a new question,
     which will require the question and answer text,
     category, and difficulty score.
@@ -61,7 +85,7 @@ def create_app(test_config=None):
     """
 
     """
-    @TODO:
+    TODO:
     Create a POST endpoint to get questions based on a search term.
     It should return any questions for whom the search term
     is a substring of the question.
@@ -72,7 +96,7 @@ def create_app(test_config=None):
     """
 
     """
-    @TODO:
+    TODO:
     Create a GET endpoint to get questions based on category.
 
     TEST: In the "List" tab / main screen, clicking on one of the
@@ -81,7 +105,7 @@ def create_app(test_config=None):
     """
 
     """
-    @TODO:
+    TODO:
     Create a POST endpoint to get questions to play the quiz.
     This endpoint should take category and previous question parameters
     and return a random questions within the given category,
@@ -92,11 +116,69 @@ def create_app(test_config=None):
     and shown whether they were correct or not.
     """
 
-    """
-    @TODO:
-    Create error handlers for all expected errors
-    including 404 and 422.
-    """
+    @app.errorhandler(404)
+    def not_found(error):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": 404,
+                    "message": "resource not found"
+                }
+            ),
+            404
+        )
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": 422,
+                    "message": "unprocessable"
+                }
+            ),
+            422
+        )
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": 400,
+                    "message": "bad request"
+                }
+            ),
+            400
+        )
+
+    @app.errorhandler(405)
+    def not_allowed(error):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": 405,
+                    "message": "method not allowed"
+                }
+            ),
+            405
+        )
+
+    @app.errorhandler(500)
+    def servererror(error):
+        return (
+            jsonify(
+                {
+                    "success": False,
+                    "error": 500,
+                    "message": "internal server error"
+                }
+            ),
+            500
+        )
 
     return app
-

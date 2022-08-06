@@ -50,20 +50,8 @@ def create_app(test_config=None):
             item = category.format()
             result[item['id']] = item['type']
 
-        return jsonify(result)
+        return jsonify({'categories': result})
 
-    """
-    TODO:
-    Create an endpoint to handle GET requests for questions,
-    including pagination (every 10 questions).
-    This endpoint should return a list of questions,
-    number of total questions, current category, categories.
-
-    TEST: At this point, when you start the application
-    you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
-    Clicking on the page numbers should update the questions.
-    """
     @app.route("/questions")
     def retrieve_questions():
         selection = Question.query.order_by(Question.id).all()
@@ -92,17 +80,11 @@ def create_app(test_config=None):
             }
         )
 
-    """
-    TODO:
-    Create an endpoint to DELETE question using a question ID.
-
-    TEST: When you click the trash icon next to a question, the question will be removed.
-    This removal will persist in the database and when you refresh the page.
-    """
     @app.route("/questions/<int:question_id>", methods=["DELETE"])
     def delete_question(question_id):
         try:
-            question = Question.query.filter(Question.id == question_id).one_or_none()
+            question = Question.query.filter(
+                Question.id == question_id).one_or_none()
 
             if question is None:
                 abort(404)
@@ -118,16 +100,46 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    """
-    TODO:
-    Create an endpoint to POST a new question,
-    which will require the question and answer text,
-    category, and difficulty score.
 
-    TEST: When you submit a question on the "Add" tab,
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.
-    """
+    @app.route("/questions", methods=['POST'])
+    def create_question():
+        body = request.get_json()
+
+        new_question = body.get("question", None)
+        new_answer = body.get("answer", None)
+        new_category = body.get("category", None)
+        new_difficulty = body.get("difficulty", None)
+        new_rating = body.get("rating", None)
+        searchTerm = body.get('searchTerm')
+
+        try:
+            if searchTerm:
+                result = Question.query.order_by(Question.id).filter(
+                    Question.question.ilike(f'%{searchTerm}%')
+                ).all()
+                current_questions = paginate_items(request, result)
+                return jsonify({
+                    'questions': current_questions,
+                    'total_question': len(result),
+                    'success': True
+                })
+            else:
+                question = Question(question=new_question,
+                                    answer=new_answer,
+                                    category=new_category,
+                                    difficulty=new_difficulty
+                                    )
+                question.insert()
+
+                return jsonify(
+                    {
+                        "created": question.id,
+                        "success": True
+                    }
+                )
+
+        except:
+            abort(422)
 
     """
     TODO:

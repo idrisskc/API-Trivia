@@ -18,6 +18,12 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgres://{}/{}".format(
             'postgres:fokou2014@localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
+        self.new_question = {
+            'question':  'Here is a new question chain',
+            'answer':  'Here is a new answer string',
+            'difficulty': 1,
+            'category': 3,
+        }
 
         # binds the app to the current context
         with self.app.app_context():
@@ -35,6 +41,13 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
 
+    def test_get_categories(self):
+        res = self.client().get("/categories")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data["categories"])
+
     def test_get_paginated_questions(self):
         res = self.client().get("/questions")
         data = json.loads(res.data)
@@ -45,7 +58,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data["current_category"])
         self.assertTrue(len(data["questions"]))
         self.assertTrue(len(data["categories"]))
-    
+
     def test_delete_question(self):
         res = self.client().delete("/questions/6")
         data = json.loads(res.data)
@@ -56,6 +69,15 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertEqual(data["deleted"], 6)
         self.assertEqual(question, None)
+
+    def test_create_new_question(self):
+        res = self.client().post("/questions", json=self.new_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["created"])
+      
 
 
 # Make the tests conveniently executable

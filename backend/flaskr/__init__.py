@@ -100,7 +100,6 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-
     @app.route("/questions", methods=['POST'])
     def create_question():
         body = request.get_json()
@@ -151,24 +150,17 @@ def create_app(test_config=None):
         except:
             abort(422)
 
- 
-    """
-    TODO:
-    Create a GET endpoint to get questions based on category.
-
-    TEST: In the "List" tab / main screen, clicking on one of the
-    categories in the left column will cause only questions of that
-    category to be shown.
-    """
     @app.route("/categories/<int:category_id>/questions", methods=['GET'])
     def retrieve_category_questions(category_id):
-        category = Category.query.filter(category_id == Category.id).one_or_none()
+        category = Category.query.filter(
+            category_id == Category.id).one_or_none()
 
         if (category is None):
             abort(404)
-    
+
         try:
-            selection = Question.query.filter(Question.category == category.id).all()
+            selection = Question.query.filter(
+                Question.category == category.id).all()
             current_questions = paginate_items(request, selection)
 
             return jsonify({
@@ -180,17 +172,28 @@ def create_app(test_config=None):
         except:
             abort(404)
 
-    """
-    TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
+    @app.route("/quizzes", methods=['POST'])
+    def retreive_next_quizz():
+        try:
+            body = request.get_json()
+            quiz_category = body.get('quiz_category')
+            previous_questions = body.get('previous_questions')
 
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not.
-    """
+            category_id = quiz_category['id']
+
+            questions = Question.query.filter(Question.id.notin_(
+                previous_questions), Question.category == category_id).all()
+
+            if(questions):
+                question = random.choice(questions)
+
+            return jsonify({
+                'question': question.format()
+            })
+
+        except:
+            abort(422)
+
 
     @app.errorhandler(404)
     def not_found(error):

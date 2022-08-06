@@ -1,4 +1,4 @@
-# The Great Bookshelf of Udacity
+# API Trivia
 
 Udacity s'investit dans la création de liens pour ses employés et ses étudiants. Des membres de l'équipe ont eu l'idée de maintenir Trivia et ont créé une page Web pour gérer l'application Trivia et jouer le jeu, mais leur expérience API est limitée et doit encore être construite. Ce projet donne leur donne la possibilité de planifier, d'implémenter et de tester une API.
 
@@ -76,7 +76,7 @@ The API will return three error types when requests fail:
 - 500: Internal Server Error 
 
 ### Endpoints 
-#### GET /books
+#### GET /categories
 - General:
     
     - Récupère un dictionnaire de catégories dans lequel les clés sont les ID, et la valeur est la chaîne correspondante de la catégorie
@@ -87,12 +87,14 @@ The API will return three error types when requests fail:
 
 ```
 {
-  "1": "Science",
-  "2": "Art",
-  "3": "Géographie",
-  "4": "Histoire",
-  "5": "Divertissement",
-  "6": "Sports"
+  "categories": {
+    "1": "Science", 
+    "2": "Art", 
+    "3": "Geography", 
+    "4": "History", 
+    "5": "Entertainment", 
+    "6": "Sports"
+  }
 }
 ```
 #### GET /questions
@@ -188,90 +190,103 @@ The API will return three error types when requests fail:
   "total_questions": 19
 }
 ```
-#### POST /books
+#### POST /questions
 - General:
-    - Creates a new book using the submitted title, author and rating. Returns the id of the created book, success value, total books, and book list based on current page number to update the frontend. 
-- `curl http://127.0.0.1:5000/books?page=3 -X POST -H "Content-Type: application/json" -d '{"title":"Neverwhere", "author":"Neil Gaiman", "rating":"5"}'`
+    - Envoie une requête POST afin d'ajouter une nouvelle question
+
+- `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{ "question":  "Here is a new question chain","answer":  "Here is a new answer string","difficulty": 1,"category": 3}'`
 ```
 {
-  "books": [
-    {
-      "author": "Neil Gaiman",
-      "id": 24,
-      "rating": 5,
-      "title": "Neverwhere"
-    }
-  ],
-  "created": 24,
-  "success": true,
-  "total_books": 17
+  "created": 25, 
+  "success": true
 }
 ```
+
+#### POST /questions
+- General:
+    -Envoie une requête POST afin de rechercher une question spécifique par terme de recherche
+
+- `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{"searchTerm": "title"}'`
+```
+{
+  "current_category": "History", 
+  "questions": [
+    {
+      "answer": "Maya Angelou", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 5, 
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }, 
+    {
+      "answer": "Edward Scissorhands", 
+      "category": 5, 
+      "difficulty": 3, 
+      "id": 6, 
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    }
+  ], 
+  "success": true, 
+  "total_questions": 2
+}
+```
+
 #### DELETE /questions/{question_id}
 - General:
   - Supprime une question spécifiée en utilisant l'identifiant de la question
   - Arguments de la requête : « id » - entier
   - Retourne : il n'est pas nécessaire de retourner autre chose que le code d'état HTTP approprié. Il est possible de renvoyer l'ID de la question. Si vous êtes en mesure de modifier le front-end, vous pouvez lui faire supprimer la question en utilisant l'id au lieu de récupérer les questions
-- `curl -X DELETE http://127.0.0.1:5000/questions/6`
+- `curl -X DELETE http://127.0.0.1:5000/questions/16`
 ```
 {
-  "books": [
-    {
-      "author": "Gina Apostol",
-      "id": 9,
-      "rating": 5,
-      "title": "Insurrecto: A Novel"
-    },
-    {
-      "author": "Tayari Jones",
-      "id": 10,
-      "rating": 5,
-      "title": "An American Marriage"
-    },
-    {
-      "author": "Jordan B. Peterson",
-      "id": 11,
-      "rating": 5,
-      "title": "12 Rules for Life: An Antidote to Chaos"
-    },
-    {
-      "author": "Kiese Laymon",
-      "id": 12,
-      "rating": 1,
-      "title": "Heavy: An American Memoir"
-    },
-    {
-      "author": "Emily Giffin",
-      "id": 13,
-      "rating": 4,
-      "title": "All We Ever Wanted"
-    },
-    {
-      "author": "Jose Andres",
-      "id": 14,
-      "rating": 4,
-      "title": "We Fed an Island"
-    },
-    {
-      "author": "Rachel Kushner",
-      "id": 15,
-      "rating": 1,
-      "title": "The Mars Room"
-    }
-  ],
-  "deleted": 16,
-  "success": true,
-  "total_books": 15
+  "deleted": 16, 
+  "success": true
 }
 ```
-#### PATCH /books/{book_id}
+
+#### GET /categories/{category_id}/questions
 - General:
-    - If provided, updates the rating of the specified book. Returns the success value and id of the modified book. 
-- `curl http://127.0.0.1:5000/books/15 -X PATCH -H "Content-Type: application/json" -d '{"rating":"1"}'`
+  - get questions based on category
+  - Arguments de la requête : « category_id » - entier
+  - Retourne : questions based on category
+- `curl -X GET  http://127.0.0.1:5000/categories/5/questions`
 ```
 {
-  "id": 15,
-  "success": true
+  "current_category": "Entertainment", 
+  "questions": [
+    {
+      "answer": "Tom Cruise", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 4, 
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    }, 
+    {
+      "answer": "Edward Scissorhands", 
+      "category": 5, 
+      "difficulty": 3, 
+      "id": 6, 
+      "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+    }
+  ], 
+  "total_questions": 2
+}
+```
+
+#### POST /quizzes
+- General:
+    - Envoie une requête POST afin d'obtenir la prochaine question
+
+- `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"previous_questions": [],"quiz_category": {"type": "Entertainment", "id": 5}}'`
+```
+{
+  "question": {
+    "answer": "Edward Scissorhands", 
+    "category": 5, 
+    "difficulty": 3, 
+    "id": 6, 
+    "question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?"
+  }
 }
 ```
 
@@ -279,7 +294,4 @@ The API will return three error types when requests fail:
 ## Deployment N/A
 
 ## Authors
-Yours truly, Coach Caryn 
-
-## Acknowledgements 
-The awesome team at Udacity and all of the students, soon to be full stack extraordinaires! 
+FOKOU Arnaud Cedric

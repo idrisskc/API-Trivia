@@ -27,6 +27,7 @@ The frontend app was built using create-react-app. In order to run the app in de
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser. The page will reload if you make edits.
 
 ```bash
+export NODE_OPTIONS=--openssl-legacy-provider
 npm start
 ```
 

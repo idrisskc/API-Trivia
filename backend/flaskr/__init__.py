@@ -109,7 +109,6 @@ def create_app(test_config=None):
         new_answer = body.get("answer", None)
         new_category = body.get("category", None)
         new_difficulty = body.get("difficulty", None)
-        new_rating = body.get("rating", None)
         searchTerm = body.get('searchTerm')
 
         try:
@@ -118,9 +117,20 @@ def create_app(test_config=None):
                     Question.question.ilike(f'%{searchTerm}%')
                 ).all()
                 current_questions = paginate_items(request, result)
+
+                selection = Category.query.all()
+
+                if len(selection) == 0:
+                    abort(404)
+                categories = {}
+                for category in selection:
+                    item = category.format()
+                    categories[item['id']] = item['type']
+
                 return jsonify({
                     'questions': current_questions,
-                    'total_question': len(result),
+                    'total_questions': len(result),
+                    'current_category': categories[4],
                     'success': True
                 })
             else:

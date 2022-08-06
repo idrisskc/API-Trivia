@@ -19,11 +19,12 @@ class TriviaTestCase(unittest.TestCase):
             'postgres:fokou2014@localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
         self.new_question = {
-            'question':  'Here is a new question chain',
+            'question':  'Here is a new question title',
             'answer':  'Here is a new answer string',
             'difficulty': 1,
             'category': 3,
         }
+        self.new_search={'searchTerm': 'title'}
 
         # binds the app to the current context
         with self.app.app_context():
@@ -78,7 +79,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data["success"], True)
         self.assertTrue(data["created"])
       
-
+    def test_search_questions(self):
+        res = self.client().post('/questions', json=self.new_search)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['current_category'])
+        self.assertEqual(data['success'], True)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

@@ -108,13 +108,17 @@ def create_app(test_config=None):
         new_answer = body.get("answer", None)
         new_category = body.get("category", None)
         new_difficulty = body.get("difficulty", None)
-        searchTerm = body.get('searchTerm')
+        searchTerm = body.get('searchTerm', None)
 
         try:
             if searchTerm:
                 result = Question.query.order_by(Question.id).filter(
                     Question.question.ilike(f'%{searchTerm}%')
                 ).all()
+
+                if len(result) == 0:
+                    abort(404)
+                    
                 current_questions = paginate_items(request, result)
 
                 selection = Category.query.all()

@@ -4,11 +4,6 @@ Udacity s'investit dans la création de liens pour ses employés et ses étudian
 
 All backend code follows [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/). 
 
-## Student Guidelines
-
-Hello students! You'll use this base in various workspaces throughout the course to build the project incrementally as you expand your skills. At each stage, there will be various 'TODO's marked for you to complete. You'll also notice some TODOs in the frontend section. You should referene those sections for formatting your endpoints and responses, and update the frontend to match the endpoints you choose and the programmed behavior. 
-
-You should feel free to expand on the project in any way you can dream up to extend your skills. For instance, you could add additional book information to each entry or create individual book views including more information about the book, your thoughts or when you completed it. 
 
 ## Getting Started
 
@@ -35,6 +30,7 @@ The application is run on `http://127.0.0.1:5000/` by default and is a proxy in 
 From the frontend folder, run the following commands to start the client: 
 ```
 npm install // only once to install dependencies
+export NODE_OPTIONS=--openssl-legacy-provider
 npm start 
 ```
 
@@ -79,9 +75,9 @@ The API will return three error types when requests fail:
 #### GET /categories
 - General:
     
-    - Récupère un dictionnaire de catégories dans lequel les clés sont les ID, et la valeur est la chaîne correspondante de la catégorie
-    - Arguments de la requête : aucun
-    - Retourne : objet avec une seule clé, « categories », qui contient un objet « id : category_string » : paires de valeurs.
+    - Retrieves a dictionary of categories in which the keys are the IDs, and the value is the corresponding string of the category
+    - Arguments of the request : none
+    - Returns: object with a single key, "categories", which contains an object "id: category_string": value pair
  
 - Sample: `curl http://127.0.0.1:5000/categories`
 
@@ -192,7 +188,7 @@ The API will return three error types when requests fail:
 ```
 #### POST /questions
 - General:
-    - Envoie une requête POST afin d'ajouter une nouvelle question
+    - Sends a POST request to add a new question
 
 - `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{ "question":  "Here is a new question chain","answer":  "Here is a new answer string","difficulty": 1,"category": 3}'`
 ```
@@ -204,7 +200,7 @@ The API will return three error types when requests fail:
 
 #### POST /questions
 - General:
-    -Envoie une requête POST afin de rechercher une question spécifique par terme de recherche
+    - Sends a POST request to search for a specific question by search term
 
 - `curl http://127.0.0.1:5000/questions -X POST -H "Content-Type: application/json" -d '{"searchTerm": "title"}'`
 ```
@@ -233,9 +229,8 @@ The API will return three error types when requests fail:
 
 #### DELETE /questions/{question_id}
 - General:
-  - Supprime une question spécifiée en utilisant l'identifiant de la question
-  - Arguments de la requête : « id » - entier
-  - Retourne : il n'est pas nécessaire de retourner autre chose que le code d'état HTTP approprié. Il est possible de renvoyer l'ID de la question. Si vous êtes en mesure de modifier le front-end, vous pouvez lui faire supprimer la question en utilisant l'id au lieu de récupérer les questions
+  - Deletes a specified question using the question ID
+  
 - `curl -X DELETE http://127.0.0.1:5000/questions/16`
 ```
 {
@@ -247,8 +242,8 @@ The API will return three error types when requests fail:
 #### GET /categories/{category_id}/questions
 - General:
   - get questions based on category
-  - Arguments de la requête : « category_id » - entier
-  - Retourne : questions based on category
+  - Arguments de la requête : « category_id » - integer
+  - Return: questions based on category
 - `curl -X GET  http://127.0.0.1:5000/categories/5/questions`
 ```
 {
@@ -275,7 +270,7 @@ The API will return three error types when requests fail:
 
 #### POST /quizzes
 - General:
-    - Envoie une requête POST afin d'obtenir la prochaine question
+    - Sends a POST request to get the next question
 
 - `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"previous_questions": [],"quiz_category": {"type": "Entertainment", "id": 5}}'`
 ```
@@ -294,4 +289,4 @@ The API will return three error types when requests fail:
 ## Deployment N/A
 
 ## Authors
-FOKOU Arnaud Cedric
+Arnaud Cedric Fokou

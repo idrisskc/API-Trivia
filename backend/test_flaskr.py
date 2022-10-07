@@ -119,7 +119,35 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['question'])
+        
+    def test_search_not_found(self):
+        search = {
+            'searchTerm': 'whatwow what wowwowwow hehehehe',
+        }
+        res = self.client().post('/search', json=search)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Page not found') 
+         
+    def test_update_question(self):
+        res = self.client().put('/questions/1')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(data["success"], True)    
 
+    def test_quiz_not_found_category(self):
+        quiz = {
+            'previous_questions': [6],
+            'quiz_category': {
+                'type': 'XXX',
+                'id': 'X'
+            }
+        }
+        res = self.client().post('/quizzes', json=quiz)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
     
        
 
